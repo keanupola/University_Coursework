@@ -1,0 +1,1242 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      -->
+<title>Assignment1</title>
+<meta name="generator" content="MATLAB 24.1">
+<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/">
+<meta name="DC.date" content="2024-11-10">
+<meta name="DC.source" content="Assignment1.m">
+<style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style>
+</head>
+<body>
+<div class="content">
+<h2>Contents</h2>
+<div>
+<ul>
+<li>
+<a href="#1">Laboratory Assignment #1: Basic Programming with MATLAB, Errors, and Root Finding Methods</a>
+</li>
+<li>
+<a href="#2">Problem 1. Arithmetic Operations</a>
+</li>
+<li>
+<a href="#3">Problem 2.1. Plotting</a>
+</li>
+<li>
+<a href="#4">Problem 2.2. Plotting</a>
+</li>
+<li>
+<a href="#5">Problem 3. Matrix and Vector Operations</a>
+</li>
+<li>
+<a href="#6">Problem 4.1 Conditionals, Logical Operators, and Loops</a>
+</li>
+<li>
+<a href="#7">Problem 4.2 Conditionals, Logical Operators, and Loops</a>
+</li>
+<li>
+<a href="#8">Problem 4.3 Conditionals, Logical Operators, and Loops</a>
+</li>
+<li>
+<a href="#9">Problem 5.1 Root Finding with Bisection Method</a>
+</li>
+<li>
+<a href="#10">Problem 5.2 Root Finding with Newton-Raphson Method</a>
+</li>
+<li>
+<a href="#11">Problem 5.3 Plot of Nonlinear Function and Approximate Solution</a>
+</li>
+</ul>
+</div>
+<h2 id="1">Laboratory Assignment #1: Basic Programming with MATLAB, Errors, and Root Finding Methods</h2>
+<pre class="codeinput">
+<span class="comment">%Name: Keanu Anderson-Pola</span>
+<span class="comment">%UTSA ID: Tro893</span>
+<span class="comment">%Date: 09/29/2024</span>
+</pre>
+<h2 id="2">Problem 1. Arithmetic Operations</h2>
+<pre class="codeinput">
+<span class="comment">%Clear previous workspace, screen, and close all figures:</span>
+clear
+clc
+close <span class="string">all</span>
+
+<span class="comment">% Compute x and y</span>
+x = 2^5 / (4^2 + 1);
+y = (1 / 7^2 - 1)^(-1);
+
+<span class="comment">% Compute N</span>
+N = sqrt((x / 6) + (x^4 / 2) + (x^(2/3) / 3) - (6 / (x * y)));
+
+<span class="comment">% Compute P</span>
+P = x + 2 * y + sin(pi / 4) + N;
+
+<span class="comment">% Display results</span>
+fprintf(<span class="string">'x = %.4f\n'</span>, x);
+fprintf(<span class="string">'y = %.4f\n'</span>, y);
+fprintf(<span class="string">'N = %.4f\n'</span>, N);
+fprintf(<span class="string">'P = %.4f\n'</span>, P);
+</pre>
+<pre class="codeoutput">x = 1.8824
+y = -1.0208
+N = 3.1971
+P = 3.7449
+</pre>
+<h2 id="3">Problem 2.1. Plotting</h2>
+<pre class="codeinput">
+<span class="comment">%Clear previous workspace, screen, and close all figures:</span>
+clear
+clc
+close <span class="string">all</span>
+
+<span class="comment">% Define x values</span>
+x = linspace(-15, 15, 75);
+
+<span class="comment">% Define y(x) and t(x)</span>
+y = -8 * x - x.^3 .* sin(x) - 100;
+t = cos(x / 4).^2;
+
+<span class="comment">% Plot y(x)</span>
+figure; <span class="comment">% Separate plots into their own windows</span>
+plot(x, y);
+xlabel(<span class="string">'x'</span>);
+ylabel(<span class="string">'y(x)'</span>);
+title(<span class="string">'y(x) = -8x - x^3sin(x) - 100'</span>);
+grid <span class="string">on</span>;
+
+<span class="comment">% Plot t(x)</span>
+figure;
+plot(x, t);
+xlabel(<span class="string">'x'</span>);
+ylabel(<span class="string">'t(x)'</span>);
+title(<span class="string">'t(x) = cos^2(x/4)'</span>);
+grid <span class="string">on</span>;
+</pre>
+<img vspace="5" hspace="5" src="Assignment1_01.png" alt=""> <img vspace="5" hspace="5" src="Assignment1_02.png" alt=""> <h2 id="4">Problem 2.2. Plotting</h2>
+<pre class="codeinput">
+<span class="comment">%Clear previous workspace, screen, and close all figures:</span>
+clear
+clc
+close <span class="string">all</span>
+
+<span class="comment">% Define x and y values</span>
+x = linspace(-5, 5, 120);
+y = linspace(-10, 10, 60);
+[X, Y] = meshgrid(x, y); <span class="comment">% 3D plot</span>
+
+<span class="comment">% Define z(x, y) and v(x, y)</span>
+z = X.^4 + (Y.^2 / 11) - 20 * X .* Y;
+v = 3 * sin(Y / 2).^2 .* cos(X / 4).^2;
+
+<span class="comment">% Plot z(x, y)</span>
+figure;
+surf(X, Y, z);
+xlabel(<span class="string">'x'</span>);
+ylabel(<span class="string">'y'</span>);
+zlabel(<span class="string">'z(x, y)'</span>);
+title(<span class="string">'z(x, y) = X^4 + (Y^2 / 11) - 20XY'</span>);
+grid <span class="string">on</span>;
+
+<span class="comment">% Plot v(x, y)</span>
+figure;
+surf(X, Y, v);
+xlabel(<span class="string">'x'</span>);
+ylabel(<span class="string">'y'</span>);
+zlabel(<span class="string">'v(x, y)'</span>);
+title(<span class="string">'v(x, y) = 3sin^2(Y/2)cos^2(X/4)'</span>);
+grid <span class="string">on</span>;
+</pre>
+<img vspace="5" hspace="5" src="Assignment1_03.png" alt=""> <img vspace="5" hspace="5" src="Assignment1_04.png" alt=""> <h2 id="5">Problem 3. Matrix and Vector Operations</h2>
+<pre class="codeinput">
+<span class="comment">%Clear previous workspace, screen, and close all figures:</span>
+clear
+clc
+close <span class="string">all</span>
+
+<span class="comment">%Problem 3.1 Matrix Product:</span>
+disp(<span class="string">'Problem 3.1'</span>)
+<span class="comment">% Create a 10x10 matrix A with random values between 0 and 1</span>
+A = rand(10);
+
+<span class="comment">% Create a 10x10 matrix B with all elements equal to 10</span>
+B = 10 * ones(10);
+
+<span class="comment">% Calculate R</span>
+R = A * B;
+
+<span class="comment">% Display matrix R</span>
+disp(R);
+
+
+<span class="comment">%Problem 3.2 Modification of Matrix Elements:</span>
+disp(<span class="string">'Problem 3.2'</span>)
+
+<span class="comment">% Replace 3rd column elements with 3</span>
+R(:, 3) = 3;
+
+<span class="comment">% Replace 6th row elements with ln(10)</span>
+R(6, :) = log(10);
+
+<span class="comment">% Replace R(3,9), R(1,5), R(8,2), and R(8,8) with 0</span>
+R(3, 9) = 0;
+R(1, 5) = 0;
+R(8, 2) = 0;
+R(8, 8) = 0;
+
+<span class="comment">% Display R</span>
+disp(R);
+
+
+<span class="comment">%Problem 3.3 Computations with Matrix Elements:</span>
+disp(<span class="string">'Problem 3.3'</span>)
+
+<span class="comment">% Calculate the product of the second row of A and ninth column of A</span>
+x = A(2, :) * A(:, 9);
+
+<span class="comment">% Calculate the ratio of A(10, 2) to B(1, 7)</span>
+y = A(10, 2) / B(1, 7);
+
+<span class="comment">% Calculate m as m = (x * y) / (sqrt(x) + y)</span>
+m = (x * y) / (sqrt(x) + y);
+
+<span class="comment">% Display x, y, and m</span>
+fprintf(<span class="string">'x = %.4f\n'</span>, x);
+fprintf(<span class="string">'y = %.4f\n'</span>, y);
+fprintf(<span class="string">'m = %.4f\n'</span>, m);
+
+<span class="comment">%Problem 3.4 Matrix Properties:</span>
+disp(<span class="string">'Problem 3.4'</span>)
+
+<span class="comment">% Compute D = m * R^T</span>
+D = m * R';
+
+<span class="comment">% Calculate the determinant of D</span>
+det_D = det(D);
+
+<span class="comment">% Calculate the rank of D</span>
+rank_D = rank(D);
+
+<span class="comment">% Calculate the eigenvalues of D</span>
+eig_D = eig(D);
+
+<span class="comment">% Display results</span>
+fprintf(<span class="string">'Determinant of D = %.4f\n'</span>, det_D);
+fprintf(<span class="string">'Rank of D = %d\n'</span>, rank_D);
+disp(<span class="string">'Eigenvalues of D:'</span>);
+disp(eig_D);
+</pre>
+<pre class="codeoutput">Problem 3.1
+  Columns 1 through 7
+
+   50.6839   50.6839   50.6839   50.6839   50.6839   50.6839   50.6839
+   43.9935   43.9935   43.9935   43.9935   43.9935   43.9935   43.9935
+   60.6712   60.6712   60.6712   60.6712   60.6712   60.6712   60.6712
+   56.0822   56.0822   56.0822   56.0822   56.0822   56.0822   56.0822
+   61.8575   61.8575   61.8575   61.8575   61.8575   61.8575   61.8575
+   45.3377   45.3377   45.3377   45.3377   45.3377   45.3377   45.3377
+   56.1339   56.1339   56.1339   56.1339   56.1339   56.1339   56.1339
+   47.7147   47.7147   47.7147   47.7147   47.7147   47.7147   47.7147
+   58.0773   58.0773   58.0773   58.0773   58.0773   58.0773   58.0773
+   47.4425   47.4425   47.4425   47.4425   47.4425   47.4425   47.4425
+
+  Columns 8 through 10
+
+   50.6839   50.6839   50.6839
+   43.9935   43.9935   43.9935
+   60.6712   60.6712   60.6712
+   56.0822   56.0822   56.0822
+   61.8575   61.8575   61.8575
+   45.3377   45.3377   45.3377
+   56.1339   56.1339   56.1339
+   47.7147   47.7147   47.7147
+   58.0773   58.0773   58.0773
+   47.4425   47.4425   47.4425
+
+Problem 3.2
+  Columns 1 through 7
+
+   50.6839   50.6839    3.0000   50.6839         0   50.6839   50.6839
+   43.9935   43.9935    3.0000   43.9935   43.9935   43.9935   43.9935
+   60.6712   60.6712    3.0000   60.6712   60.6712   60.6712   60.6712
+   56.0822   56.0822    3.0000   56.0822   56.0822   56.0822   56.0822
+   61.8575   61.8575    3.0000   61.8575   61.8575   61.8575   61.8575
+    2.3026    2.3026    2.3026    2.3026    2.3026    2.3026    2.3026
+   56.1339   56.1339    3.0000   56.1339   56.1339   56.1339   56.1339
+   47.7147         0    3.0000   47.7147   47.7147   47.7147   47.7147
+   58.0773   58.0773    3.0000   58.0773   58.0773   58.0773   58.0773
+   47.4425   47.4425    3.0000   47.4425   47.4425   47.4425   47.4425
+
+  Columns 8 through 10
+
+   50.6839   50.6839   50.6839
+   43.9935   43.9935   43.9935
+   60.6712         0   60.6712
+   56.0822   56.0822   56.0822
+   61.8575   61.8575   61.8575
+    2.3026    2.3026    2.3026
+   56.1339   56.1339   56.1339
+         0   47.7147   47.7147
+   58.0773   58.0773   58.0773
+   47.4425   47.4425   47.4425
+
+Problem 3.3
+x = 2.4391
+y = 0.0959
+m = 0.1412
+Problem 3.4
+Determinant of D = 0.0000
+Rank of D = 5
+Eigenvalues of D:
+  57.9286 + 0.0000i
+  -5.6409 + 0.0000i
+   1.7495 + 0.0000i
+  -0.2251 + 0.3355i
+  -0.2251 - 0.3355i
+  -0.0000 + 0.0000i
+   0.0000 + 0.0000i
+   0.0000 + 0.0000i
+  -0.0000 + 0.0000i
+  -0.0000 + 0.0000i
+
+</pre>
+<h2 id="6">Problem 4.1 Conditionals, Logical Operators, and Loops</h2>
+<pre class="codeinput">
+<span class="comment">%Clear previous workspace, screen, and close all figures:</span>
+clear
+clc
+close <span class="string">all</span>
+
+<span class="comment">% Define test cases for a, b, and c in 3x3 matrix to loop through</span>
+test_cases = [1, -3, 2; 1, -2, 1; 1, 2, 5];
+
+<span class="keyword">for</span> i = 1:size(test_cases, 1)
+    a = test_cases(i, 1);
+    b = test_cases(i, 2);
+    c = test_cases(i, 3);
+
+    <span class="comment">% Calculate discriminant</span>
+    discriminant = b^2 - 4*a*c;
+
+    <span class="comment">% Use conditional statements to check roots</span>
+    <span class="keyword">if</span> discriminant &gt; 0
+        <span class="comment">% Real and distinct roots</span>
+        root1 = (-b + sqrt(discriminant)) / (2*a);
+        root2 = (-b - sqrt(discriminant)) / (2*a);
+        fprintf(<span class="string">'Case %d: Real and distinct roots: root1 = %.4f, root2 = %.4f\n'</span>, i, root1, root2);
+    <span class="keyword">elseif</span> discriminant == 0
+        <span class="comment">% Real and repeated roots</span>
+        root = -b / (2*a);
+        fprintf(<span class="string">'Case %d: Real and repeated root: root = %.4f\n'</span>, i, root);
+    <span class="keyword">elseif</span> discriminant &lt; 0
+        <span class="comment">% Complex roots</span>
+        realPart = -b / (2*a);
+        imagPart = sqrt(abs(discriminant)) / (2*a);
+        fprintf(<span class="string">'Case %d: Complex roots: root1 = %.4f + %.4fi, root2 = %.4f - %.4fi\n'</span>, i, realPart, imagPart, realPart, imagPart);
+    <span class="keyword">else</span>
+        fprintf(<span class="string">'Invalid entry\n'</span>);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre>
+<pre class="codeoutput">Case 1: Real and distinct roots: root1 = 2.0000, root2 = 1.0000
+Case 2: Real and repeated root: root = 1.0000
+Case 3: Complex roots: root1 = -1.0000 + 2.0000i, root2 = -1.0000 - 2.0000i
+</pre>
+<h2 id="7">Problem 4.2 Conditionals, Logical Operators, and Loops</h2>
+<pre class="codeinput">
+<span class="comment">%Clear previous workspace, screen, and close all figures:</span>
+clear
+clc
+close <span class="string">all</span>
+
+<span class="comment">% Define 5 values for 'a'</span>
+a_values = [1, 5, 9, 13, 17];
+
+<span class="comment">% Create a vector of 200 equally spaced x values between 0 and 20</span>
+x = linspace(0, 20, 200);
+
+<span class="comment">% Initialize a y matrix to store the results for each 'a'</span>
+y = zeros(length(a_values), length(x));
+
+<span class="comment">% Hold on to plot all the curves on the same figure</span>
+figure;
+hold <span class="string">on</span>;
+
+<span class="comment">% Loop through each value of 'a'</span>
+<span class="keyword">for</span> i = 1:length(a_values)
+    a = a_values(i);
+
+    <span class="comment">% Loop through each value of x</span>
+    <span class="keyword">for</span> j = 1:length(x)
+        <span class="keyword">if</span> x(j) &lt;= a
+            y(i, j) = sin(x(j) - a)^2; <span class="comment">% Piece 1: sin^2(x - a)</span>
+        <span class="keyword">else</span>
+            y(i, j) = 7 * log(x(j) + a); <span class="comment">% Piece 2: 7 ln(x + a)</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">% Plot the y(x) for the current 'a'</span>
+    plot(x, y(i, :), <span class="string">'DisplayName'</span>, sprintf(<span class="string">'a = %d'</span>, a_values(i)));
+<span class="keyword">end</span>
+
+<span class="comment">% Add labels, title, and grid</span>
+xlabel(<span class="string">'x'</span>);
+ylabel(<span class="string">'y(x)'</span>);
+title(<span class="string">'Piecewise Function y(x) for a'</span>);
+legend <span class="string">show</span>;
+grid <span class="string">on</span>;
+hold <span class="string">off</span>;
+</pre>
+<img vspace="5" hspace="5" src="Assignment1_05.png" alt=""> <h2 id="8">Problem 4.3 Conditionals, Logical Operators, and Loops</h2>
+<pre class="codeinput">
+<span class="comment">%Clear previous workspace, screen, and close all figures:</span>
+clear
+clc
+close <span class="string">all</span>
+
+<span class="comment">% Create a 10x10 matrix A where each entry is row number / column number</span>
+A = zeros(10); <span class="comment">% Initialize the matrix A</span>
+
+<span class="keyword">for</span> i = 1:10
+    <span class="keyword">for</span> j = 1:10
+        A(i, j) = i / j; <span class="comment">% Row number divided by column number</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">% Use IF conditional statements and FOR loops to create matrix R</span>
+R = A; <span class="comment">% Copy matrix A into R</span>
+<span class="keyword">for</span> i = 1:10
+    <span class="keyword">for</span> j = 1:10
+        <span class="keyword">if</span> R(i, j) &gt; 1.1
+            R(i, j) = 0; <span class="comment">% Replace elements greater than 1.1 with 0</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">% Use IF conditional statements and FOR loops to create matrix T</span>
+T = A; <span class="comment">% Copy matrix A into T</span>
+<span class="keyword">for</span> i = 1:10
+    <span class="keyword">for</span> j = 1:10
+        <span class="keyword">if</span> T(i, j) &lt; 2.5
+            T(i, j) = -8; <span class="comment">% Replace elements less than 2.5 with -8</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">% Display A, R, and T</span>
+disp(<span class="string">'Matrix A:'</span>);
+disp(A);
+
+disp(<span class="string">'Matrix R:'</span>);
+disp(R);
+
+disp(<span class="string">'Matrix T:'</span>);
+disp(T);
+</pre>
+<pre class="codeoutput">Matrix A:
+  Columns 1 through 7
+
+    1.0000    0.5000    0.3333    0.2500    0.2000    0.1667    0.1429
+    2.0000    1.0000    0.6667    0.5000    0.4000    0.3333    0.2857
+    3.0000    1.5000    1.0000    0.7500    0.6000    0.5000    0.4286
+    4.0000    2.0000    1.3333    1.0000    0.8000    0.6667    0.5714
+    5.0000    2.5000    1.6667    1.2500    1.0000    0.8333    0.7143
+    6.0000    3.0000    2.0000    1.5000    1.2000    1.0000    0.8571
+    7.0000    3.5000    2.3333    1.7500    1.4000    1.1667    1.0000
+    8.0000    4.0000    2.6667    2.0000    1.6000    1.3333    1.1429
+    9.0000    4.5000    3.0000    2.2500    1.8000    1.5000    1.2857
+   10.0000    5.0000    3.3333    2.5000    2.0000    1.6667    1.4286
+
+  Columns 8 through 10
+
+    0.1250    0.1111    0.1000
+    0.2500    0.2222    0.2000
+    0.3750    0.3333    0.3000
+    0.5000    0.4444    0.4000
+    0.6250    0.5556    0.5000
+    0.7500    0.6667    0.6000
+    0.8750    0.7778    0.7000
+    1.0000    0.8889    0.8000
+    1.1250    1.0000    0.9000
+    1.2500    1.1111    1.0000
+
+Matrix R:
+  Columns 1 through 7
+
+    1.0000    0.5000    0.3333    0.2500    0.2000    0.1667    0.1429
+         0    1.0000    0.6667    0.5000    0.4000    0.3333    0.2857
+         0         0    1.0000    0.7500    0.6000    0.5000    0.4286
+         0         0         0    1.0000    0.8000    0.6667    0.5714
+         0         0         0         0    1.0000    0.8333    0.7143
+         0         0         0         0         0    1.0000    0.8571
+         0         0         0         0         0         0    1.0000
+         0         0         0         0         0         0         0
+         0         0         0         0         0         0         0
+         0         0         0         0         0         0         0
+
+  Columns 8 through 10
+
+    0.1250    0.1111    0.1000
+    0.2500    0.2222    0.2000
+    0.3750    0.3333    0.3000
+    0.5000    0.4444    0.4000
+    0.6250    0.5556    0.5000
+    0.7500    0.6667    0.6000
+    0.8750    0.7778    0.7000
+    1.0000    0.8889    0.8000
+         0    1.0000    0.9000
+         0         0    1.0000
+
+Matrix T:
+  Columns 1 through 7
+
+   -8.0000   -8.0000   -8.0000   -8.0000   -8.0000   -8.0000   -8.0000
+   -8.0000   -8.0000   -8.0000   -8.0000   -8.0000   -8.0000   -8.0000
+    3.0000   -8.0000   -8.0000   -8.0000   -8.0000   -8.0000   -8.0000
+    4.0000   -8.0000   -8.0000   -8.0000   -8.0000   -8.0000   -8.0000
+    5.0000    2.5000   -8.0000   -8.0000   -8.0000   -8.0000   -8.0000
+    6.0000    3.0000   -8.0000   -8.0000   -8.0000   -8.0000   -8.0000
+    7.0000    3.5000   -8.0000   -8.0000   -8.0000   -8.0000   -8.0000
+    8.0000    4.0000    2.6667   -8.0000   -8.0000   -8.0000   -8.0000
+    9.0000    4.5000    3.0000   -8.0000   -8.0000   -8.0000   -8.0000
+   10.0000    5.0000    3.3333    2.5000   -8.0000   -8.0000   -8.0000
+
+  Columns 8 through 10
+
+   -8.0000   -8.0000   -8.0000
+   -8.0000   -8.0000   -8.0000
+   -8.0000   -8.0000   -8.0000
+   -8.0000   -8.0000   -8.0000
+   -8.0000   -8.0000   -8.0000
+   -8.0000   -8.0000   -8.0000
+   -8.0000   -8.0000   -8.0000
+   -8.0000   -8.0000   -8.0000
+   -8.0000   -8.0000   -8.0000
+   -8.0000   -8.0000   -8.0000
+
+</pre>
+<h2 id="9">Problem 5.1 Root Finding with Bisection Method</h2>
+<pre class="codeinput">
+<span class="comment">%Clear previous workspace, screen, and close all figures:</span>
+clear
+clc
+close <span class="string">all</span>
+
+<span class="comment">% Define f(x)</span>
+f = @(x) 2400 * log(2.8e6 / (2.8e6 - 1.4e4 * x)) - 9.81 * x - 450;
+
+<span class="comment">% Verify function values at initial bounds</span>
+<span class="comment">% f_xl = f(100);</span>
+<span class="comment">% f_xu = f(500);</span>
+<span class="comment">% fprintf('f(100) = %.4f\n', f_xl);</span>
+<span class="comment">% fprintf('f(500) = %.4f\n', f_xu);</span>
+
+<span class="comment">% Define the initial guesses for xl and xu</span>
+xl = 100;
+xu = 500;
+
+<span class="comment">% Set tolerance and max iterations</span>
+tol = 1e-4;
+max_iter = 50;
+
+<span class="comment">% Initialize arrays for storing results</span>
+xr_values = zeros(1, max_iter);
+error_values = zeros(1, max_iter);
+
+<span class="comment">% Bisection method implementation</span>
+<span class="keyword">for</span> i = 1:max_iter
+    xr = (xl + xu) / 2;  <span class="comment">% Midpoint</span>
+    xr_values(i) = xr;   <span class="comment">% Store current approximation</span>
+
+    <span class="comment">% Calculate absolute approximate percentage error</span>
+    <span class="keyword">if</span> i &gt; 1
+        error_values(i) = abs((xr_values(i) - xr_values(i-1)) / xr_values(i)) * 100;
+    <span class="keyword">else</span>
+        error_values(i) = NaN;  <span class="comment">% No error on the first iteration</span>
+    <span class="keyword">end</span>
+
+    <span class="keyword">if</span> f(xr) == 0 || abs((xu - xl) / xr) &lt; tol
+        <span class="keyword">break</span>;  <span class="comment">% Root found or tolerance reached</span>
+    <span class="keyword">elseif</span> f(xl) * f(xr) &lt; 0
+        xu = xr;  <span class="comment">% Root is in the left interval</span>
+    <span class="keyword">else</span>
+        xl = xr;  <span class="comment">% Root is in the right interval</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">% Trim unused iterations</span>
+xr_values = xr_values(1:i);
+error_values = error_values(2:i);
+
+<span class="comment">% Display the final approximation of the root</span>
+fprintf(<span class="string">'Approximate root = %.4f\n'</span>, xr);
+
+<span class="comment">% Plot the approximate solution vs iterations</span>
+figure;
+plot(1:i, xr_values, <span class="string">'-o'</span>);
+xlabel(<span class="string">'Iteration'</span>);
+ylabel(<span class="string">'Approximate solution (xr)'</span>);
+title(<span class="string">'Approximate Solution vs Iterations'</span>);
+grid <span class="string">on</span>;
+
+<span class="comment">% Plot the absolute approximate percentage error vs iterations</span>
+figure;
+plot(2:i, error_values, <span class="string">'-o'</span>);
+xlabel(<span class="string">'Iteration'</span>);
+ylabel(<span class="string">'Absolute Approximate Percentage Error (%)'</span>);
+title(<span class="string">'Error vs Iterations'</span>);
+grid <span class="string">on</span>;
+</pre>
+<pre class="codeoutput">Approximate root = 250.0122
+</pre>
+<img vspace="5" hspace="5" src="Assignment1_06.png" alt=""> <img vspace="5" hspace="5" src="Assignment1_07.png" alt=""> <h2 id="10">Problem 5.2 Root Finding with Newton-Raphson Method</h2>
+<pre class="codeinput">
+<span class="comment">%Clear previous workspace, screen, and close all figures:</span>
+clear
+clc
+close <span class="string">all</span>
+
+<span class="comment">% Define the function f(x) and its derivative f'(x)</span>
+f = @(x) 2400 * log(2.8e6 / (2.8e6 - 1.4e4 * x)) - 9.81 * x - 450;
+f_prime = @(x) (2400 * 1.4e4) / (2.8e6 - 1.4e4 * x) - 9.81;
+
+<span class="comment">% Initial guess</span>
+x0 = 150;
+tol = 1e-4;
+max_iter = 50;
+
+<span class="comment">% Initialize variables to store results</span>
+x_values = zeros(1, max_iter);
+error_values = zeros(1, max_iter);
+
+<span class="comment">% Newton-Raphson method implementation</span>
+<span class="keyword">for</span> i = 1:max_iter
+    <span class="comment">% Compute the derivative and check if it's too small</span>
+    f_prime_value = f_prime(x0);
+
+    <span class="comment">% Newton-Raphson formula</span>
+    x_new = x0 - f(x0) / f_prime_value;
+
+    x_values(i) = x_new;  <span class="comment">% Store the current approximation</span>
+
+    <span class="comment">% Calculate absolute approximate percentage error</span>
+    <span class="keyword">if</span> i &gt; 1
+        error_values(i) = abs((x_values(i) - x_values(i-1)) / x_values(i)) * 100;
+    <span class="keyword">else</span>
+        error_values(i) = NaN;  <span class="comment">% No error on the first iteration</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">% Check if the tolerance is satisfied</span>
+    <span class="keyword">if</span> abs(f(x_new)) &lt; tol
+        <span class="keyword">break</span>;
+    <span class="keyword">end</span>
+
+    <span class="comment">% Update for the next iteration</span>
+    x0 = x_new;
+<span class="keyword">end</span>
+
+<span class="comment">% Trim unused iterations</span>
+x_values = x_values(1:i);
+error_values = error_values(2:i);
+
+<span class="comment">% Display the final approximation of the root</span>
+fprintf(<span class="string">'Approximate root = %.4f\n'</span>, x_new);
+
+<span class="comment">% Plot the approximate solution vs iterations</span>
+figure;
+plot(1:i, x_values);
+xlabel(<span class="string">'Iteration'</span>);
+ylabel(<span class="string">'Approximate solution (x)'</span>);
+title(<span class="string">'Approximate Solution vs Iterations (Newton-Raphson)'</span>);
+grid <span class="string">on</span>;
+
+<span class="comment">% Plot the absolute approximate percentage error vs iterations</span>
+figure;
+plot(2:i, error_values);
+xlabel(<span class="string">'Iteration'</span>);
+ylabel(<span class="string">'Absolute Approximate Percentage Error (%)'</span>);
+title(<span class="string">'Error vs Iterations (Newton-Raphson)'</span>);
+grid <span class="string">on</span>;
+</pre>
+<pre class="codeoutput">Approximate root = 80.8593
+</pre>
+<img vspace="5" hspace="5" src="Assignment1_08.png" alt=""> <img vspace="5" hspace="5" src="Assignment1_09.png" alt=""> <h2 id="11">Problem 5.3 Plot of Nonlinear Function and Approximate Solution</h2>
+<pre class="codeinput">clear
+clc
+close <span class="string">all</span>
+
+<span class="comment">% Define the function f(x) with element-wise operations</span>
+f = @(x) 2400 * log(2.8e6 ./ (2.8e6 - 1.4e4 .* x)) - 9.81 .* x - 450;
+
+<span class="comment">% Define x values for the plot (range from 0 to 200)</span>
+x_plot = linspace(0, 200, 1000);
+
+<span class="comment">% Calculate f(x) for the plot</span>
+y_plot = f(x_plot);
+
+<span class="comment">% Plot the function</span>
+figure;
+plot(x_plot, y_plot);
+hold <span class="string">on</span>;
+
+<span class="comment">% Mark the approximate root found by Newton-Raphson</span>
+root = 80.8593; <span class="comment">% Approximate root</span>
+plot(root, f(root), <span class="string">'ro'</span>, <span class="string">'MarkerSize'</span>, 8, <span class="string">'MarkerFaceColor'</span>, <span class="string">'r'</span>); <span class="comment">% Red circle for the root</span>
+
+<span class="comment">% Add labels and title</span>
+xlabel(<span class="string">'x'</span>);
+ylabel(<span class="string">'f(x)'</span>);
+title(<span class="string">'Nonlinear Function and Approximate Solution'</span>);
+grid <span class="string">on</span>;
+
+<span class="comment">% Add legend</span>
+legend(<span class="string">'f(x)'</span>, <span class="string">'Approximate Root'</span>);
+hold <span class="string">off</span>;
+</pre>
+<img vspace="5" hspace="5" src="Assignment1_10.png" alt=""> <p class="footer">
+<br>
+<a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2024a</a>
+<br>
+</p>
+</div>
+<!--
+##### SOURCE BEGIN #####
+%% Laboratory Assignment #1: Basic Programming with MATLAB, Errors, and Root Finding Methods
+%Name: Keanu Anderson-Pola
+%UTSA ID: Tro893
+%Date: 09/29/2024
+
+%% Problem 1. Arithmetic Operations
+%Clear previous workspace, screen, and close all figures:
+clear
+clc
+close all
+
+% Compute x and y
+x = 2^5 / (4^2 + 1);
+y = (1 / 7^2 - 1)^(-1);
+
+% Compute N
+N = sqrt((x / 6) + (x^4 / 2) + (x^(2/3) / 3) - (6 / (x * y)));
+
+% Compute P
+P = x + 2 * y + sin(pi / 4) + N;
+
+% Display results
+fprintf('x = %.4f\n', x);
+fprintf('y = %.4f\n', y);
+fprintf('N = %.4f\n', N);
+fprintf('P = %.4f\n', P);
+
+%% Problem 2.1. Plotting
+%Clear previous workspace, screen, and close all figures:
+clear
+clc
+close all
+
+% Define x values
+x = linspace(-15, 15, 75);
+
+% Define y(x) and t(x)
+y = -8 * x - x.^3 .* sin(x) - 100;
+t = cos(x / 4).^2;
+
+% Plot y(x)
+figure; % Separate plots into their own windows
+plot(x, y);
+xlabel('x');
+ylabel('y(x)');
+title('y(x) = -8x - x^3sin(x) - 100');
+grid on;
+
+% Plot t(x)
+figure;
+plot(x, t);
+xlabel('x');
+ylabel('t(x)');
+title('t(x) = cos^2(x/4)');
+grid on;
+
+%% Problem 2.2. Plotting
+%Clear previous workspace, screen, and close all figures:
+clear
+clc
+close all
+
+% Define x and y values
+x = linspace(-5, 5, 120);
+y = linspace(-10, 10, 60);
+[X, Y] = meshgrid(x, y); % 3D plot
+
+% Define z(x, y) and v(x, y)
+z = X.^4 + (Y.^2 / 11) - 20 * X .* Y;
+v = 3 * sin(Y / 2).^2 .* cos(X / 4).^2;
+
+% Plot z(x, y)
+figure;
+surf(X, Y, z);
+xlabel('x');
+ylabel('y');
+zlabel('z(x, y)');
+title('z(x, y) = X^4 + (Y^2 / 11) - 20XY');
+grid on;
+
+% Plot v(x, y)
+figure;
+surf(X, Y, v);
+xlabel('x');
+ylabel('y');
+zlabel('v(x, y)');
+title('v(x, y) = 3sin^2(Y/2)cos^2(X/4)');
+grid on;
+
+
+%% Problem 3. Matrix and Vector Operations
+%Clear previous workspace, screen, and close all figures:
+clear
+clc
+close all
+
+%Problem 3.1 Matrix Product:
+disp('Problem 3.1')
+% Create a 10x10 matrix A with random values between 0 and 1
+A = rand(10);
+
+% Create a 10x10 matrix B with all elements equal to 10
+B = 10 * ones(10);
+
+% Calculate R
+R = A * B;
+
+% Display matrix R
+disp(R);
+
+
+%Problem 3.2 Modification of Matrix Elements:
+disp('Problem 3.2')
+
+% Replace 3rd column elements with 3
+R(:, 3) = 3;
+
+% Replace 6th row elements with ln(10)
+R(6, :) = log(10);
+
+% Replace R(3,9), R(1,5), R(8,2), and R(8,8) with 0
+R(3, 9) = 0;
+R(1, 5) = 0;
+R(8, 2) = 0;
+R(8, 8) = 0;
+
+% Display R
+disp(R);
+
+
+%Problem 3.3 Computations with Matrix Elements:
+disp('Problem 3.3')
+
+% Calculate the product of the second row of A and ninth column of A
+x = A(2, :) * A(:, 9);
+
+% Calculate the ratio of A(10, 2) to B(1, 7)
+y = A(10, 2) / B(1, 7);
+
+% Calculate m as m = (x * y) / (sqrt(x) + y)
+m = (x * y) / (sqrt(x) + y);
+
+% Display x, y, and m
+fprintf('x = %.4f\n', x);
+fprintf('y = %.4f\n', y);
+fprintf('m = %.4f\n', m);
+
+%Problem 3.4 Matrix Properties:
+disp('Problem 3.4')
+
+% Compute D = m * R^T
+D = m * R';
+
+% Calculate the determinant of D
+det_D = det(D);
+
+% Calculate the rank of D
+rank_D = rank(D);
+
+% Calculate the eigenvalues of D
+eig_D = eig(D);
+
+% Display results
+fprintf('Determinant of D = %.4f\n', det_D);
+fprintf('Rank of D = %d\n', rank_D);
+disp('Eigenvalues of D:');
+disp(eig_D);
+
+
+%% Problem 4.1 Conditionals, Logical Operators, and Loops
+%Clear previous workspace, screen, and close all figures:
+clear
+clc
+close all
+
+% Define test cases for a, b, and c in 3x3 matrix to loop through
+test_cases = [1, -3, 2; 1, -2, 1; 1, 2, 5];
+
+for i = 1:size(test_cases, 1)
+    a = test_cases(i, 1);
+    b = test_cases(i, 2);
+    c = test_cases(i, 3);
+
+    % Calculate discriminant
+    discriminant = b^2 - 4*a*c;
+
+    % Use conditional statements to check roots
+    if discriminant > 0
+        % Real and distinct roots
+        root1 = (-b + sqrt(discriminant)) / (2*a);
+        root2 = (-b - sqrt(discriminant)) / (2*a);
+        fprintf('Case %d: Real and distinct roots: root1 = %.4f, root2 = %.4f\n', i, root1, root2);
+    elseif discriminant == 0
+        % Real and repeated roots
+        root = -b / (2*a);
+        fprintf('Case %d: Real and repeated root: root = %.4f\n', i, root);
+    elseif discriminant < 0
+        % Complex roots
+        realPart = -b / (2*a);
+        imagPart = sqrt(abs(discriminant)) / (2*a);
+        fprintf('Case %d: Complex roots: root1 = %.4f + %.4fi, root2 = %.4f - %.4fi\n', i, realPart, imagPart, realPart, imagPart);
+    else
+        fprintf('Invalid entry\n');
+    end
+end
+
+%% Problem 4.2 Conditionals, Logical Operators, and Loops
+%Clear previous workspace, screen, and close all figures:
+clear
+clc
+close all
+
+% Define 5 values for 'a'
+a_values = [1, 5, 9, 13, 17];
+
+% Create a vector of 200 equally spaced x values between 0 and 20
+x = linspace(0, 20, 200);
+
+% Initialize a y matrix to store the results for each 'a'
+y = zeros(length(a_values), length(x));
+
+% Hold on to plot all the curves on the same figure
+figure;
+hold on;
+
+% Loop through each value of 'a'
+for i = 1:length(a_values)
+    a = a_values(i);
+    
+    % Loop through each value of x
+    for j = 1:length(x)
+        if x(j) <= a
+            y(i, j) = sin(x(j) - a)^2; % Piece 1: sin^2(x - a)
+        else
+            y(i, j) = 7 * log(x(j) + a); % Piece 2: 7 ln(x + a)
+        end
+    end
+    
+    % Plot the y(x) for the current 'a'
+    plot(x, y(i, :), 'DisplayName', sprintf('a = %d', a_values(i)));
+end
+
+% Add labels, title, and grid
+xlabel('x');
+ylabel('y(x)');
+title('Piecewise Function y(x) for a');
+legend show; 
+grid on;
+hold off;
+
+
+%% Problem 4.3 Conditionals, Logical Operators, and Loops
+%Clear previous workspace, screen, and close all figures:
+clear
+clc
+close all
+
+% Create a 10x10 matrix A where each entry is row number / column number
+A = zeros(10); % Initialize the matrix A
+
+for i = 1:10
+    for j = 1:10
+        A(i, j) = i / j; % Row number divided by column number
+    end
+end
+
+% Use IF conditional statements and FOR loops to create matrix R
+R = A; % Copy matrix A into R
+for i = 1:10
+    for j = 1:10
+        if R(i, j) > 1.1
+            R(i, j) = 0; % Replace elements greater than 1.1 with 0
+        end
+    end
+end
+
+% Use IF conditional statements and FOR loops to create matrix T
+T = A; % Copy matrix A into T
+for i = 1:10
+    for j = 1:10
+        if T(i, j) < 2.5
+            T(i, j) = -8; % Replace elements less than 2.5 with -8
+        end
+    end
+end
+
+% Display A, R, and T
+disp('Matrix A:');
+disp(A);
+
+disp('Matrix R:');
+disp(R);
+
+disp('Matrix T:');
+disp(T);
+
+%% Problem 5.1 Root Finding with Bisection Method
+%Clear previous workspace, screen, and close all figures:
+clear
+clc
+close all
+
+% Define f(x)
+f = @(x) 2400 * log(2.8e6 / (2.8e6 - 1.4e4 * x)) - 9.81 * x - 450;
+
+% Verify function values at initial bounds
+% f_xl = f(100);
+% f_xu = f(500);
+% fprintf('f(100) = %.4f\n', f_xl);
+% fprintf('f(500) = %.4f\n', f_xu);
+
+% Define the initial guesses for xl and xu
+xl = 100;
+xu = 500;
+
+% Set tolerance and max iterations
+tol = 1e-4;
+max_iter = 50;
+
+% Initialize arrays for storing results
+xr_values = zeros(1, max_iter);
+error_values = zeros(1, max_iter);
+
+% Bisection method implementation
+for i = 1:max_iter
+    xr = (xl + xu) / 2;  % Midpoint
+    xr_values(i) = xr;   % Store current approximation
+    
+    % Calculate absolute approximate percentage error
+    if i > 1
+        error_values(i) = abs((xr_values(i) - xr_values(i-1)) / xr_values(i)) * 100;
+    else
+        error_values(i) = NaN;  % No error on the first iteration
+    end
+    
+    if f(xr) == 0 || abs((xu - xl) / xr) < tol
+        break;  % Root found or tolerance reached
+    elseif f(xl) * f(xr) < 0
+        xu = xr;  % Root is in the left interval
+    else
+        xl = xr;  % Root is in the right interval
+    end
+end
+
+% Trim unused iterations
+xr_values = xr_values(1:i);
+error_values = error_values(2:i);
+
+% Display the final approximation of the root
+fprintf('Approximate root = %.4f\n', xr);
+
+% Plot the approximate solution vs iterations
+figure;
+plot(1:i, xr_values, '-o');
+xlabel('Iteration');
+ylabel('Approximate solution (xr)');
+title('Approximate Solution vs Iterations');
+grid on;
+
+% Plot the absolute approximate percentage error vs iterations
+figure;
+plot(2:i, error_values, '-o');
+xlabel('Iteration');
+ylabel('Absolute Approximate Percentage Error (%)');
+title('Error vs Iterations');
+grid on;
+
+
+%% Problem 5.2 Root Finding with Newton-Raphson Method
+%Clear previous workspace, screen, and close all figures:
+clear
+clc
+close all
+
+% Define the function f(x) and its derivative f'(x)
+f = @(x) 2400 * log(2.8e6 / (2.8e6 - 1.4e4 * x)) - 9.81 * x - 450;
+f_prime = @(x) (2400 * 1.4e4) / (2.8e6 - 1.4e4 * x) - 9.81;
+
+% Initial guess
+x0 = 150; 
+tol = 1e-4;
+max_iter = 50;  
+
+% Initialize variables to store results
+x_values = zeros(1, max_iter);
+error_values = zeros(1, max_iter);
+
+% Newton-Raphson method implementation
+for i = 1:max_iter
+    % Compute the derivative and check if it's too small
+    f_prime_value = f_prime(x0);
+ 
+    % Newton-Raphson formula
+    x_new = x0 - f(x0) / f_prime_value;
+    
+    x_values(i) = x_new;  % Store the current approximation
+    
+    % Calculate absolute approximate percentage error
+    if i > 1
+        error_values(i) = abs((x_values(i) - x_values(i-1)) / x_values(i)) * 100;
+    else
+        error_values(i) = NaN;  % No error on the first iteration
+    end
+    
+    % Check if the tolerance is satisfied
+    if abs(f(x_new)) < tol
+        break;
+    end
+    
+    % Update for the next iteration
+    x0 = x_new;
+end
+
+% Trim unused iterations
+x_values = x_values(1:i);
+error_values = error_values(2:i);
+
+% Display the final approximation of the root
+fprintf('Approximate root = %.4f\n', x_new);
+
+% Plot the approximate solution vs iterations
+figure;
+plot(1:i, x_values);
+xlabel('Iteration');
+ylabel('Approximate solution (x)');
+title('Approximate Solution vs Iterations (Newton-Raphson)');
+grid on;
+
+% Plot the absolute approximate percentage error vs iterations
+figure;
+plot(2:i, error_values);
+xlabel('Iteration');
+ylabel('Absolute Approximate Percentage Error (%)');
+title('Error vs Iterations (Newton-Raphson)');
+grid on;
+
+
+
+%% Problem 5.3 Plot of Nonlinear Function and Approximate Solution
+clear
+clc
+close all
+
+% Define the function f(x) with element-wise operations
+f = @(x) 2400 * log(2.8e6 ./ (2.8e6 - 1.4e4 .* x)) - 9.81 .* x - 450;
+
+% Define x values for the plot (range from 0 to 200)
+x_plot = linspace(0, 200, 1000);
+
+% Calculate f(x) for the plot
+y_plot = f(x_plot);
+
+% Plot the function
+figure;
+plot(x_plot, y_plot);
+hold on;
+
+% Mark the approximate root found by Newton-Raphson
+root = 80.8593; % Approximate root
+plot(root, f(root), 'ro', 'MarkerSize', 8, 'MarkerFaceColor', 'r'); % Red circle for the root
+
+% Add labels and title
+xlabel('x');
+ylabel('f(x)');
+title('Nonlinear Function and Approximate Solution');
+grid on;
+
+% Add legend
+legend('f(x)', 'Approximate Root');
+hold off;
+##### SOURCE END #####
+-->
+</body>
+</html>

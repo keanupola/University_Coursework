@@ -1,0 +1,414 @@
+----- C:\UTSA-Coursework\CS_3443_Application_Programming\Labs\Lab3\app\src\main\java\edu\utsa\cs3443\myscript.ps1 -----
+Get-ChildItem -Recurse -File | ForEach-Object {
+    Add-Content -Path "all_contents.txt" -Value "----- $($_.FullName) -----"
+    Get-Content -Path $_.FullName | Add-Content -Path "all_contents.txt"
+    Add-Content -Path "all_contents.txt" -Value ""
+}
+
+----- C:\UTSA-Coursework\CS_3443_Application_Programming\Labs\Lab3\app\src\main\java\edu\utsa\cs3443\tro893_lab3\MainActivity.java -----
+package edu.utsa.cs3443.tro893_lab3;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.Toast;
+import android.os.Bundle;
+
+
+import edu.utsa.cs3443.tro893_lab3.model.Listing;
+import edu.utsa.cs3443.tro893_lab3.model.Property;
+
+/**
+ * The main activity for this Property application.
+ * It dynamically displays properties as buttons.
+ *
+ * @author Keanu Anderson-Pola
+ * @abc123 tro893
+ */
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    private Listing listing;
+
+    /**
+     * Initializes listing and sets up property buttons.
+     *
+     * @param savedInstanceState, data most recently used or null
+     */
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // Method calls
+        createListing();
+        dynamicSetupButtons();
+    }
+
+    /**
+     * Displays property price or an error message if the property is not found.
+     *
+     * @param view, The button that was clicked
+     */
+    @Override
+    public void onClick(View view) {
+        // Cast the clicked view to a Button
+        Button clickedButton = (Button) view;
+        // Retrieve and convert address of clicked button to a string
+        String address = clickedButton.getText().toString();
+
+        // Find property details based on address
+        Property property = listing.getProperty(address);
+
+        if (property != null) {
+            // Cast double to int for price
+            Toast.makeText(view.getContext(), "$" + (int) property.getPrice(), Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(view.getContext(), "Property not found", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    /**
+     * Dynamically generates and sets up buttons for each property.
+     */
+    private void dynamicSetupButtons() {
+        // Create a layout object
+        LinearLayout rootLayout = findViewById(R.id.root_layout);
+
+        for (Property property : listing.getProperties()) {
+            // For each property, create a button object
+            Button propertyButton = new Button(this);
+            propertyButton.setText(property.getLocation());
+            propertyButton.setOnClickListener(this);
+            // Setup the attributes for the button
+            LinearLayout.LayoutParams buttonAttributes
+                    = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            // Add the button to the layout
+            rootLayout.addView(propertyButton, buttonAttributes);
+        }
+    }
+
+    /**
+     * Initializes the property listing by loading properties from assets
+     */
+    private void createListing() {
+        listing = new Listing();
+        listing.loadProperties(this);
+    }
+
+}
+
+----- C:\UTSA-Coursework\CS_3443_Application_Programming\Labs\Lab3\app\src\main\java\edu\utsa\cs3443\tro893_lab3\model\CommercialProperty.java -----
+package edu.utsa.cs3443.tro893_lab3.model;
+
+/**
+ * Represents a commercial property with additional attributes: zone, number of units, and
+ * number of parking spots.
+ *
+ * @author Keanu Anderson-Pola
+ * @abc123 tro893
+ */
+public class CommercialProperty extends Property {
+    private String zone;
+    private int numUnits;
+    private int numParkingSpots;
+
+    // Constructor
+    public CommercialProperty(String id, String location, double price, String zone, int numUnits, int numParkingSpots) {
+        super(id, location, price);
+        this.zone = zone;
+        this.numUnits = numUnits;
+        this.numParkingSpots = numParkingSpots;
+    }
+
+    // Getters and setters
+    /**
+     * Gets the zone for this commercial property.
+     * @return string, the property's zone
+     */
+    public String getZone() { return zone; }
+    /**
+     * Sets the zone for this commercial property.
+     * @param zone, the property's zone (string)
+     */
+    public void setZone(String zone) { this.zone = zone; }
+
+    /**
+     * Gets the number of units for this commercial property
+     * @return int, the number of units at this property
+     */
+    public int getNumUnits() { return numUnits; }
+    /**
+     * Sets the number of units this commercial property
+     * @param numUnits, the number of units at this property (int)
+     */
+    public void setNumUnits(int numUnits) { this.numUnits = numUnits; }
+
+    /**
+     * Gets the number of parking spots for this commercial property
+     * @return int, the number of parking spots at this property
+     */
+    public int getNumParkingSpots() { return numParkingSpots; }
+    /**
+     * Sets the number of parking spots for this commercial property
+     * @param numParkingSpots, the number of parking spots at this property
+     */
+    public void setNumParkingSpots(int numParkingSpots) { this.numParkingSpots = numParkingSpots; }
+
+    /**
+     * Returns a string representation of the CommercialProperty object,
+     * including the zone, number of units, and the number of parking spots
+     *
+     * @return string representation of the CommercialProperty
+     */
+    @Override
+    public String toString() {
+        return super.toString() + ", Zone: " + zone + ", Number of Units: " + numUnits + ", Number of Parking Spots: " + numParkingSpots;
+    }
+
+}
+
+----- C:\UTSA-Coursework\CS_3443_Application_Programming\Labs\Lab3\app\src\main\java\edu\utsa\cs3443\tro893_lab3\model\Listing.java -----
+package edu.utsa.cs3443.tro893_lab3.model;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.io.InputStream;
+import android.content.res.AssetManager;
+
+import edu.utsa.cs3443.tro893_lab3.MainActivity;
+
+/**
+ * This class creates and manages a list of properties, allowing for property loading and retrieval
+ *
+ * @author Keanu Anderson-Pola
+ * @abc123 tro893
+ */
+public class Listing {
+    private ArrayList<Property> properties;
+
+    // Constructor
+    public Listing() {
+        // initialized to empty list
+        this.properties = new ArrayList<>();
+    }
+
+
+    /**
+     * Loads properties from "listings.csv" in assets
+     *
+     * @param activity, the main activity used to access the assets
+     */
+    public void loadProperties(MainActivity activity) {
+        // Get the AssetManager from the provided activity to access the app's assets
+        AssetManager manager = activity.getAssets();
+
+        // Initialize the properties list if it's null
+        if (properties == null) {
+            properties = new ArrayList<>();
+        }
+
+        String filename = "listings.csv";
+        try {
+            // Open the CSV file for reading
+            InputStream file = manager.open(filename);
+            Scanner scan = new Scanner(file);
+
+            String line; // Temp line var
+
+            // Loop through each line in the CSV file
+            while (scan.hasNextLine()) {
+                line = scan.nextLine();
+                String[] tokens = line.split(","); // split lines at ","
+
+                String id = tokens[0].trim();
+                String location = tokens[1].trim();
+                double price = Double.parseDouble(tokens[2].trim());
+
+                // Check property type and create the appropriate object
+                if (id.startsWith("rp")) {
+                    double annualHOAFees = Double.parseDouble(tokens[3].trim());
+                    int numBedrooms = Integer.parseInt(tokens[4].trim());
+                    double numBathrooms = Double.parseDouble(tokens[5].trim());
+                    properties.add(new ResidentialProperty(id, location, price, annualHOAFees, numBedrooms, numBathrooms));
+                } else if (id.startsWith("cp")) {
+                    String zone = tokens[3].trim();
+                    int numUnits = Integer.parseInt(tokens[4].trim());
+                    int numParkingSpots = Integer.parseInt(tokens[5].trim());
+                    properties.add(new CommercialProperty(id, location, price, zone, numUnits, numParkingSpots));
+                }
+            }
+            // Close scanner
+            scan.close();
+        } catch (IOException e) {
+            System.out.println("Failed to read data");
+        }
+    }
+
+    /**
+     * Returns a property based on its address
+     *
+     * @param address, the property's address
+     * @return Property, the property with the address, or null if DNE
+     */
+    public Property getProperty(String address) {
+        for (Property property : properties) {
+            if (property.getLocation().equals(address)) {
+                return property;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns a list of all properties in the listing.
+     * @return ArrayList of all properties
+     */
+    public ArrayList<Property> getProperties() {
+        return properties;
+    }
+
+
+}
+
+----- C:\UTSA-Coursework\CS_3443_Application_Programming\Labs\Lab3\app\src\main\java\edu\utsa\cs3443\tro893_lab3\model\Property.java -----
+package edu.utsa.cs3443.tro893_lab3.model;
+
+/**
+ * Represents a generic property with attributes: id, location, and price.
+ *
+ * @author Keanu Anderson-Pola
+ * @abc123 tro893
+ */
+public abstract class Property {
+    private String id;
+    private String location;
+    private double price;
+
+    // Constructor
+    public Property(String id, String location, double price) {
+        this.id = id;
+        this.location = location;
+        this.price = price;
+    }
+
+    // Getters and setters
+    /**
+     * Returns the ID of the property.
+     * @return property ID
+     */
+    public String getId() { return id; }
+    /**
+     * Sets the ID of the property.
+     * @param id, property id (string)
+     */
+    public void setId(String id) { this.id = id; }
+
+    /**
+     * Returns the location of the property.
+     * @return string, property location
+     */
+    public String getLocation() { return location; }
+    /**
+     * Sets the location of the property.
+     * @param location, property location (string)
+     */
+    public void setLocation(String location) { this.location = location; }
+
+    /**
+     * Returns the price of the property.
+     * @return double, property price
+     */
+    public double getPrice() { return price; }
+    /**
+     * Sets the price of the property.
+     * @param price, property price (double)
+     */
+    public void setPrice(double price) { this.price = price; }
+
+    /**
+     * Returns a string representation of the Property object,
+     * the property id, address (location), and the property amount (price).
+     *
+     * @return string representation of the Property.
+     */
+    @Override
+    public String toString() {
+        return "Property ID: " + id + ", Location: " + location + ", Price: $" + price;
+    }
+
+}
+
+
+----- C:\UTSA-Coursework\CS_3443_Application_Programming\Labs\Lab3\app\src\main\java\edu\utsa\cs3443\tro893_lab3\model\ResidentialProperty.java -----
+package edu.utsa.cs3443.tro893_lab3.model;
+
+/**
+ * Represents a residential property with additional attributes: annual HOA fees,
+ * number of bedrooms, and number of bathrooms.
+ *
+ * @author Keanu Anderson-Pola
+ * @abc123 tro893
+ */
+public class ResidentialProperty extends Property {
+    private double annualHOAFees;
+    private int numBedrooms;
+    private double numBathrooms;
+
+    // Constructor
+    public ResidentialProperty(String id, String location, double price, double annualHOAFees, int numBedrooms, double numBathrooms) {
+        super(id, location, price);
+        this.annualHOAFees = annualHOAFees;
+        this.numBedrooms = numBedrooms;
+        this.numBathrooms = numBathrooms;
+    }
+
+    // Getters and setters
+    /**
+     * Gets annual HOA fees for this residential property.
+     * @return double, annual HOA fees
+     */
+    public double getAnnualHOAFees() { return annualHOAFees; }
+    /**
+     * Sets annual HOA fees for this residential property.
+     * @param annualHOAFees (double)
+     */
+    public void setAnnualHOAFees(double annualHOAFees) { this.annualHOAFees = annualHOAFees; }
+
+    /**
+     * Gets number of bedrooms for this residential property.
+     * @return int, number of bedrooms
+     */
+    public int getNumBedrooms() { return numBedrooms; }
+    /**
+     * Sets number of bedrooms for this residential property.
+     * @param numBedrooms, number of bedrooms (int)
+     */
+    public void setNumBedrooms(int numBedrooms) { this.numBedrooms = numBedrooms; }
+
+    /**
+     * Gets number of bathrooms for this residential property.
+     * @return int, number of bathrooms
+     */
+    public double getNumBathrooms() { return numBathrooms; }
+    /**
+     * Sets number of bathrooms for this residential property.
+     * @param numBathrooms, number of bathrooms (int)
+     */
+    public void setNumBathrooms(double numBathrooms) { this.numBathrooms = numBathrooms; }
+
+    /**
+     * Returns a string representation of the ResidentialProperty object,
+     * including the annual HOA fees, number of bedrooms, and number of bathrooms.
+     *
+     * @return string representation of the ResidentialProperty.
+     */
+    @Override
+    public String toString() {
+        return super.toString() + ", Annual HOA Fees: $" + annualHOAFees + ", Number of Bedrooms: " + numBedrooms + ", Number of Bathrooms: " + numBathrooms;
+    }
+
+}
+

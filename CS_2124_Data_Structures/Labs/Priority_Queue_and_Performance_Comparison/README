@@ -1,0 +1,19 @@
+For this lab you will write your own main.c file. Your main.c file will
+do the following:
+
+1. Write the code that will init both a heap and a priority queue that
+was implemented with a linked list. The code that implements these is already provided.
+
+2. Using your priority queue you initialized you will conduct 3 separate time measurements. 
+Measure how long it takes to enqueue 1000 nodes, 10000 nodes, 
+and 100000 nodes in seconds. Print your results to the terminal. (you can do more if you like)
+The priority that is used to enqueue each node should be a random int between 0-99.
+
+3. Repeat step 2 with the heap you initialized.
+
+There is a sample main.c file that illustrates how to use the time.h library for time measurement 
+as well as demonstrating how to use the rand() function call.
+
+Turn in your output for all your time measurements as a text file. 
+(you do not need to turn in your code)
+

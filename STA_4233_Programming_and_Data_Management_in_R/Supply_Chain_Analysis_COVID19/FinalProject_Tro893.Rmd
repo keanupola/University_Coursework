@@ -1,0 +1,762 @@
+---
+title: 'Supply Chain Uncertainty: Cleaning and Exploring Lead Times from ODM Sites to Warehouses During the COVID-19 Pandemic'
+author: "Keanu Anderson-Pola"
+date: "May 2023"
+output: 
+  html_document: 
+    toc: yes
+---
+
+![ODM Sites and Warehouse Locations](images/Screenshot%202023-05-05%20014341.png)
+
+# [**Project Overview**]{.underline}
+
+This project aims to address supply chain challenges during the COVID-19 pandemic by cleaning and analyzing raw data associated with Lead Times from Original Design Manufacturer (ODM) sites to warehouses. I will be focusing on the connections between Lead Times and their respective variables. The project's objectives include:
+
+1.  Cleaning the raw dataset by handling missing values, inconsistencies, and outliers.
+
+2.  Exploring the relationships and correlations among the variable in the cleaned dataset.
+
+3.  Offering insights into the connections between these variables and the processes and reasoning behind them.
+
+To achieve these objectives, I have used R programming and various packages such as dplyr, ggplot2, and lubridate for data manipulation, analysis, and visualization.
+
+# [**Data Cleaning and Preparation**]{.underline}
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+# Load packages
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+library(readxl)
+
+
+# Read in Raw-Data and Calendar worksheets of RawData.xlsx 
+rawData <- read_excel("RawData.xlsx", sheet = 1)
+calendar <- read_excel("RawData.xlsx", sheet = 2)
+#change to date for future analysis
+rawData$`PO Download Date` <- as.Date(rawData$`PO Download Date`, format = "%m/%d/%Y")
+rawData$`Ship Date` <- as.Date(rawData$`Ship Date`, format = "%m/%d/%Y")
+rawData$`Receipt Date` <- as.Date(rawData$`Receipt Date`, format = "%m/%d/%Y")
+calendar$`Start_Date` <- as.Date(calendar$`Start_Date`, format = "%m/%d/%Y")
+calendar$`End_date` <- as.Date(calendar$`End_date`, format = "%m/%d/%Y")
+```
+
+**As part of Setup, I changed all date/time values to date for future calculations. Not doing so will yield errors and false results**
+
+## Adding Quarter and Year columns
+
+After reading in the raw data from the excel file my next objective was to add the appropriate 'Quarter' and 'Year' columns to the dataset and match them to the receipt dates. This involved:
+
+-   Converting the date/time values into date format
+
+-   Iterating through the receipt date column and checking to see which range (if any) it fell into and then storing the matches
+
+-   Populating a new 'Quarter' and 'Year' column with these matches
+
+```{r add_quarter_year, echo = FALSE}
+
+add_quarter_year <- function(rawData, calendar) {
+  
+  # Function to find the quarter and year for receipt date
+  find_quarter_year <- function(receiptDate, calendar) {
+    if (is.na(receiptDate)) {
+      return(c(NA, NA))
+    }
+    for (i in 1:nrow(calendar)) {
+      if (receiptDate >= calendar$`Start_Date`[i] & receiptDate <= calendar$`End_date`[i]) {
+        return(c(calendar$Quarter[i], calendar$Year[i]))
+      }
+    }
+    return(c(NA, NA))
+  }
+  
+  # Initialize Quarter and Year columns in rawData
+  rawData$Quarter <- NA
+  rawData$Year <- NA
+  
+  # Loop through rawData and populate Quarter and Year columns
+  for (i in 1:nrow(rawData)) {
+    receiptDate <- rawData$`Receipt Date`[i]
+    quarterYear <- find_quarter_year(receiptDate, calendar) # store matches
+    rawData$Quarter[i] <- quarterYear[1]
+    rawData$Year[i] <- quarterYear[2]
+  }
+  
+  return(rawData)
+}
+
+rawData <- add_quarter_year(rawData, calendar)
+```
+
+## Calculating and adding In-Transit and Manufacturing Lead Times
+
+My next objective was rather simple, I needed to add Lead Time (in days) columns to the dataset. The Manufacturing Lead Time was obtained by subtracting the 'PO Download Date' (the date the ODM got the ticket for a product) from the 'Ship Date' (the date the product left the ODM facility). The In-Transit Lead Time was calculated by subtracting the 'Ship Date' from the 'Receipt Date' (the date the inventory warehouse received the product).
+
+```{r add_lead_times, echo = FALSE}
+rawData <- rawData %>%
+  mutate(
+    `Manufacturing Lead Time` = as.numeric(`Ship Date` - `PO Download Date`),
+    `In-transit Lead Time` = as.numeric(`Receipt Date` - `Ship Date`)
+  )
+
+```
+
+## Exploring ways to clean and impute the Data
+
+First, I examined the table itself to find the best ways to clean and impute the data. Key observations included
+
+-   ***There were no N/A values for LOB, Origin, and Ship Mode***
+
+-   ***There were negative lead time values, these needed be removed***
+
+-   ***In manufacturing lead time there was a big jump from 51 to 105 while the lower non-negative lead times had reasonable in-transit lead times***
+
+-   ***For In-Transit lead times I found that all days past 55 as well as 0 days had inconsistent manufacturing lead times***
+
+Before using this information for imputation, I wanted to see the general distribution of Lead Times by combining them into a single box-plot.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+rawData_long <- rawData %>% 
+  select(`Manufacturing Lead Time`, `In-transit Lead Time`) %>% 
+  pivot_longer(cols = everything(), names_to = "Lead Time Type", values_to = "Lead Time")
+
+#-------------------------------------------------------------------------------
+# Combined box plot for Manufacturing and In-transit Lead Times
+#-------------------------------------------------------------------------------
+box_leadTimes <- ggplot(rawData_long, aes(x = `Lead Time Type`, y = `Lead Time`)) +
+  geom_boxplot() +
+  labs(title = "In-transit & Manufacturing Lead Times",
+       x = "Lead Time Type",
+       y = "Lead Time (days)")
+box_leadTimes
+# *There are extreme outliers in both directions*
+
+```
+
+The box-plot revealed numerous extreme outliers, indicating the need for thorough cleaning and analysis.\
+
+I cleaned the dataset by replacing values outside the designated range with NAs. The ranges for the new lead times are:
+
+|                             |                                      |
+|-----------------------------|--------------------------------------|
+| **Manufacturing Lead Time** | 0 \<= Manufacturing Lead Time \<= 51 |
+| **In-Transit Lead Time**    | 0 \< In-Transit Lead Time \<= 55     |
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+rawData <- rawData %>%
+  mutate(`Manufacturing Lead Time` = ifelse(`Manufacturing Lead Time` >= 0 & `Manufacturing Lead Time` <= 51, `Manufacturing Lead Time`, NA),
+         `In-transit Lead Time` = ifelse(`In-transit Lead Time` > 0 & `In-transit Lead Time` <= 55, `In-transit Lead Time`, NA))
+```
+
+Before imputing values, I checked the other variables ('LOB,' 'Origin,' and 'Ship Mode') for inconsistencies and their values:
+
+***LOB***
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+table(rawData$LOB)
+```
+
+***Origin***
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+table(rawData$Origin)
+```
+
+***Ship Mode***
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+table(rawData$`Ship Mode`) 
+```
+
+### Imputing values
+
+After viewing the table values I chose to impute the Lead Times columns with the average rounded lead times grouped by LOB, Origin, and Ship Mode. I also created new columns to count the number of rows that were imputed for each column. Before doing this I saved the cleaned dataset (named 'rawData_noImpute") for later use in checking for any significant information loss.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+avg_leadTimes <- rawData %>%
+  group_by(LOB, Origin, `Ship Mode`) %>%
+  summarise(`Avg MLT` = round(mean(`Manufacturing Lead Time`, na.rm = TRUE)),
+            `Avg ITLT` = round(mean(`In-transit Lead Time`, na.rm = TRUE)))
+
+
+rawData_noImpute <- rawData
+
+
+rawData <- rawData %>%
+  left_join(avg_leadTimes, by = c("LOB", "Origin", "Ship Mode")) %>%
+  mutate(`MLT Imputed` = is.na(`Manufacturing Lead Time`),
+         `ITLT imputed` = is.na(`In-transit Lead Time`),
+         `Manufacturing Lead Time` = ifelse(is.na(`Manufacturing Lead Time`), `Avg MLT`, `Manufacturing Lead Time`),
+         `In-transit Lead Time` = ifelse(is.na(`In-transit Lead Time`), `Avg ITLT`, `In-transit Lead Time`),
+         `Any Lead Time Imputed` = `MLT Imputed` | `ITLT imputed`) %>%
+  select(-`Avg MLT`, -`Avg ITLT`)
+```
+
+***Rows imputed:***
+
+|                              |     |
+|------------------------------|-----|
+| **Total**                    | 520 |
+| **Manufacturing Lead Times** | 477 |
+| **In-transit Lead Times**    | 291 |
+
+After calculating this, I saved another dataset named 'rawData_someImpute' as a sort of checkpoint before altering the original dataset. My reasoning was that my next objective would require me to impute data onto rows with NA values in the 'Ship Date' and 'Receipt Date' columns. I discovered that every NA in the 'Shipment Date' column had a matching NA in the 'Receipt Date' column, which I kept for later comparison.
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+sum(is.na(rawData$`Ship Date`)) # 145
+sum(is.na(rawData$`Receipt Date`)) # 145
+# Losing 145 rows, they all correspond on the table
+rawData_someImpute <- rawData %>%
+  filter(!is.na(rawData$`Ship Date`)) # only need one since they are equal
+
+```
+
+### Impute missing dates
+
+After checking the amount of NA's in the 'Ship Date' and 'Receipt Date' columns (145 total), it was time to replace those to make a fully clean dataset. In order to replace the 'Ship Date' column I had to use the newly imputed 'Manufacturing Lead Time's and add it to the 'PO Download Date'. After that I used that same 'Ship Date' and added the 'In-Transit Lead Time' to produce the 'Receipt Date'. The logic was as follows:
+
+|                  |                                            |
+|------------------|--------------------------------------------|
+| **Ship Date**    | Manufacturing Lead Time + PO Download Date |
+| **Receipt Date** | In-Transit Lead Time + Ship Date           |
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+### Impute missing Ship Date values and overwrite original column
+##
+#-------------------------------------------------------------------------------
+rawData <- rawData %>%
+  mutate(`Ship Date` = ifelse(is.na(`Ship Date`),
+                              `PO Download Date` + days(`Manufacturing Lead Time`),
+                              `Ship Date`)) %>%
+  mutate(`Ship Date` = as.Date(`Ship Date`, origin = "1970-01-01"))
+
+#-------------------------------------------------------------------------------
+### Impute missing Receipt Date values and overwrite original column
+##
+#-------------------------------------------------------------------------------
+rawData <- rawData %>%
+  mutate(`Receipt Date` = ifelse(is.na(`Receipt Date`),
+                                 `Ship Date` + days(`In-transit Lead Time`),
+                                 `Receipt Date`)) %>%
+  mutate(`Receipt Date` = as.Date(`Receipt Date`, origin = "1970-01-01"))
+
+#-------------------------------------------------------------------------------
+### Update Quarter and Year columns 
+##
+#-------------------------------------------------------------------------------
+add_quarter_year(rawData, calendar)
+
+```
+
+With these newly imputed values I had to update the Quarter and Year columns to match.
+
+# [**Data Exploration**]{.underline}
+
+Before I started to *explore* anything I removed all columns and NA's (145 from 'rawData_noImpute') as they wont be needed further. I also combined the 'Quarter' and 'Year' column into 'Year-Quarter" for convenience and to make a better time measurement.
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+# Remove unecessary columns and NA's from rawData's for analysis, combine year 
+# and quarter columns
+#-------------------------------------------------------------------------------
+rawData_noImpute <- rawData_noImpute %>%
+  filter(!is.na(`Ship Date`)) %>%
+  mutate(Year_Quarter = paste0(Year, "-", Quarter)) %>%
+  select(-c(4:8))
+
+rawData_someImpute <- rawData_someImpute %>%
+  mutate(Year_Quarter = paste0(Year, "-", Quarter)) %>%
+  select(-c(4:8), -c(11:13))
+
+rawData <- rawData %>%
+  mutate(Year_Quarter = paste0(Year, "-", Quarter)) %>%
+  select(-c(4:8), -c(11:13))
+```
+
+**Note: at this point the original dataset that is fully cleaned has all rows (9124 observations) and 6 columns, the other datasets have 8979 observations (-145 for NA's) and 6 columns**
+
+## Check when inconsistent values were inputted
+
+Out of curiosity and a desire to use my newly created Quarter-Year column, I decided to create a table and a bar plot to give an idea of when most of the inconsistent/NA values were inputted, maybe gaining insight as to why. This was used on the first saved dataset 'rawData_noImpute' since it is cleaned and has it's NA's have not been imputed.
+
+**Note MLT stand for 'Manufacturing Lead Time' and ITLT stand for 'In-Transit Lead Time'**
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+missing_leadTimes <- rawData_noImpute %>%
+  mutate(missing_MLT = is.na(`Manufacturing Lead Time`),
+         missing_ITLT = is.na(`In-transit Lead Time`))
+
+# Count the occurrences of missing values for each Year_Quarter
+missing_by_year_quarter <- missing_leadTimes %>%
+  group_by(Year_Quarter) %>%
+  summarise(n_missing_MLT = sum(missing_MLT, na.rm = TRUE),
+            n_missing_ITLT = sum(missing_ITLT, na.rm = TRUE),
+            n_total_missing = n_missing_MLT + n_missing_ITLT)
+# Table
+missing_by_year_quarter
+
+# Plot for total
+bar_missing_by_year_quarter <- ggplot(missing_by_year_quarter, aes(x = Year_Quarter, y = n_total_missing)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Missing Lead Times by Year and Quarter",
+       x = "Year and Quarter",
+       y = "Total Missing Count") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+bar_missing_by_year_quarter
+
+
+```
+
+As shown above, the first half of 2020 consisted of the majority of NA/inconsistent values. This is very likely directly due to the corona virus pandemic which was starting around that time.
+
+## Explore the relation between Lead Times and LOB, Origin, and Ship Mode
+
+When exploring these relations I used the three datasets I saved ('rawData_someImpute' rawData_noImpute' and the original fully cleaned 'rawData') when calculating summary statistics. I did for every relation to compare outputs to check for significant loss of information .
+
+### Relation between average In-Transit Lead Time and Ship Mode
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+## Explore relation b/w lead times and LOB, Origin, and Ship Mode
+##
+# Relation between In-Transit Lead Time and Ship Mode
+#-------------------------------------------------------------------------------
+# summary statistic version test 
+shipMode_summary1 <-  rawData %>% 
+  group_by(`Ship Mode`) %>%
+  summarize(`In-Transit Lead Time Avg.` = mean(`In-transit Lead Time`, na.rm = TRUE))
+shipMode_summary2 <-  rawData_someImpute %>% 
+  group_by(`Ship Mode`) %>%
+  summarize(`In-Transit Lead Time Avg.` = mean(`In-transit Lead Time`, na.rm = TRUE))
+shipMode_summary3 <-  rawData_noImpute %>% 
+  group_by(`Ship Mode`) %>%
+  summarize(`In-Transit Lead Time Avg.` = mean(`In-transit Lead Time`, na.rm = TRUE))
+# No significant difference
+
+bar_avgITLT_by_shipMode <- ggplot(shipMode_summary1, aes(x = `Ship Mode`, y = `In-Transit Lead Time Avg.`, fill = `Ship Mode`)) +
+  geom_bar(stat = "identity") +
+  labs(title = "In-Transit Lead Time by Ship Mode",
+       x = "Ship Mode",
+       y = "Avg. In-Transit Lead Time (days)")
+
+bar_avgITLT_by_shipMode
+
+```
+
+In-Transit Lead times are much higher than average when the 'Ship mode' is Ocean and Fastboat. This shows that shipping over water on average took more than 2 times longer than the other shipping modes, air and ground.
+
+### Relation between average In-Transit Lead Time and both Ship Mode & LOB
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#-------------------------------------------------------------------------------
+# Relation between In-Transit Lead Time and Ship Mode/LOB
+#-------------------------------------------------------------------------------
+# summary statistic version test 
+shipMode_LOB_summary1 <- rawData %>%
+  group_by(`Ship Mode`, LOB) %>%
+  summarize(`In-Transit Lead Time Avg.` = mean(`In-transit Lead Time`, na.rm = TRUE))
+shipMode_LOB_summary2 <- rawData_someImpute %>%
+  group_by(`Ship Mode`, LOB) %>%
+  summarize(`In-Transit Lead Time Avg.` = mean(`In-transit Lead Time`, na.rm = TRUE))
+shipMode_LOB_summary3 <- rawData %>%
+  group_by(`Ship Mode`, LOB) %>%
+  summarize(`In-Transit Lead Time Avg.` = mean(`In-transit Lead Time`, na.rm = TRUE))
+# No significant difference
+
+# Create a bar chart
+bar_avgITLT_by_shipMode_LOB <- ggplot(shipMode_LOB_summary1, aes(x = `Ship Mode`, y = `In-Transit Lead Time Avg.`, fill = LOB)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "In-Transit Lead Time by Ship Mode and LOB",
+       x = "Ship Mode",
+       y = "Avg. In-Transit Lead Time (days)")
+
+bar_avgITLT_by_shipMode_LOB
+# Ocean has very high avg. In-Transit Lead Times
+
+```
+
+Again, the Lead Time for In-Transit over water is much higher than it's counterparts, regardless of LOB.
+
+### Relation between average Manufacturing Lead Time and LOB
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#-------------------------------------------------------------------------------
+# Relation between Manufacturing Lead Time and LOB
+#-------------------------------------------------------------------------------
+# summary statistic version test 
+lob_summary1 <- rawData %>%
+  group_by(LOB) %>%
+  summarise(`Manufacturing Lead Time Avg.` = mean(`Manufacturing Lead Time`, na.rm = TRUE))
+lob_summary2 <- rawData_someImpute %>%
+  group_by(LOB) %>%
+  summarise(`Manufacturing Lead Time Avg.` = mean(`Manufacturing Lead Time`, na.rm = TRUE))
+lob_summary3 <- rawData_noImpute %>%
+  group_by(LOB) %>%
+  summarise(`Manufacturing Lead Time Avg.` = mean(`Manufacturing Lead Time`, na.rm = TRUE))
+# No significant differences
+
+bar_avgMLT_by_lob <- ggplot(lob_summary1, aes(x = LOB, y = `Manufacturing Lead Time Avg.`, fill = LOB)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Avg. Manufacturing Lead Time by LOB",
+       x = "LOB",
+       y = "Manufacturing Lead Time (days)")
+
+bar_avgMLT_by_lob
+# Manufacturing Lead Time is significantly higher for product C
+```
+
+Product C has the highest average Manufacturing Lead Time by a fair margin.
+
+### Relation between average Manufacturing and both Lead Time & Origin
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+# summary statistic version test 
+origin_summary1 <- rawData %>%
+  group_by(Origin) %>%
+  summarise(`Manufacturing Lead Time Avg.` = mean(`Manufacturing Lead Time`, na.rm = TRUE))
+origin_summary2 <- rawData_someImpute %>%
+  group_by(Origin) %>%
+  summarise(`Manufacturing Lead Time Avg.` = mean(`Manufacturing Lead Time`, na.rm = TRUE))
+origin_summary3 <- rawData_noImpute %>%
+  group_by(Origin) %>%
+  summarise(`Manufacturing Lead Time Avg.` = mean(`Manufacturing Lead Time`, na.rm = TRUE))
+# no significant differences
+
+bar_avgMLT_by_origin <- ggplot(origin_summary1, aes(x = Origin, y = `Manufacturing Lead Time Avg.`, fill = Origin)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Avg. Manufacturing Lead Time by Origin",
+       x = "Origin",
+       y = "Manufacturing Lead Time (days)")
+
+bar_avgMLT_by_origin
+# Manufacturing Lead Time is significantly higher for Site B
+```
+
+Site B has the highest average Manufacturing Lead Time by a large amount.
+
+### Relation between average Manufacturing Lead Time and both LOB & Origin
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# Relation between Manufacturing Lead Time and both LOB & Origin
+#-------------------------------------------------------------------------------
+# summary statistic version test 
+lob_origin_summary1 <- rawData %>%
+  group_by(LOB, Origin) %>%
+  summarise(`Manufacturing Lead Time Avg.` = mean(`Manufacturing Lead Time`, na.rm = TRUE))
+lob_origin_summary2 <- rawData_someImpute %>%
+  group_by(LOB, Origin) %>%
+  summarise(`Manufacturing Lead Time Avg.` = mean(`Manufacturing Lead Time`, na.rm = TRUE))
+lob_origin_summary3 <- rawData_noImpute %>%
+  group_by(LOB, Origin) %>%
+  summarise(`Manufacturing Lead Time Avg.` = mean(`Manufacturing Lead Time`, na.rm = TRUE))
+# No significant difference
+
+bar_avgMLT_by_lob_origin <- ggplot(lob_origin_summary1, aes(x = LOB, y = `Manufacturing Lead Time Avg.`, fill = Origin)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Avg. Manufacturing Lead Time by LOB and Origin",
+       x = "LOB",
+       y = "Manufacturing Lead Time (days)") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+bar_avgMLT_by_lob_origin
+# Product B at site B and Product C at site A average much higher Manufacturing
+# Lead times than other combinations, B is the only product handled at all
+# sites
+```
+
+This reflects the previous charts, site B and product C still have the highest average Manufacturing Lead Times. It is worth noting that only product B is produced on all sites.
+
+After calculating various summary statistics I noticed that there was no significant difference between the three versions so there would be no significant loss of information by continuing with the fully cleaned version.
+
+# [**Calculate and report correlations between all categorical variables and In-Transit Lead Time**]{.underline}
+
+The final objective. Before visualizing the relations I first created a list of all combinations of 'Ship Mode', 'LOB' and 'Origin' future use called 'group_combinations'. I first used it to create a list of box plots based on the In-Transit Lead Time and every unique combination in that list. I then stored each element of the box plot list under their appropriate nomenclature. One issue I came across was in plotting the data for combinations, the x-axis labels were too long so I replaced them with letters that also needed to be put next to the fill variables for clarity (x axis labels and fill are the same category for these).
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+#### Calculate and report correlations between all categorical variables and
+### In-Transit Lead Time
+##
+# Define the group combinations for future calculation
+#-------------------------------------------------------------------------------
+group_combinations <- list(
+  c("LOB"),
+  c("Origin"),
+  c("Ship Mode"),
+  c("LOB", "Origin"),
+  c("LOB", "Ship Mode"),
+  c("Origin", "Ship Mode"),
+  c("LOB", "Origin", "Ship Mode")
+)
+
+#-------------------------------------------------------------------------------
+# Generate box plots for each group combination by In-Transit Lead Time
+#-------------------------------------------------------------------------------
+plots_list <- list() # Create an empty list to store the generated plots
+
+for (i in seq_along(group_combinations)) {
+  # Get the current combination of categorical variables
+  current_combination <- group_combinations[[i]]
+  
+  # Define the plot title based on the current combination
+  plot_title <- paste("In-Transit Lead Time by", paste(current_combination, collapse = ", "))
+  
+  # Generate the box plot for the current combination
+  plot_data <- rawData[, c(current_combination, "In-transit Lead Time")]
+  # use `interaction()` to create a single factor variable 
+  # representing the unique combinations of group combination. 
+  # The `!!!rlang::syms(current_combination)` code 
+  # is used to unquote the symbols in the 'current_combination' list so that 
+  # they can be treated as separate arguments within the `interaction()` 
+  # function.
+  plot_aes <- aes(x = interaction(!!!rlang::syms(current_combination)), y = `In-transit Lead Time`, fill = interaction(!!!rlang::syms(current_combination)))
+  current_plot <- ggplot(plot_data, plot_aes) +
+    geom_boxplot() +
+    labs(title = plot_title,
+         x = paste(current_combination, collapse = ", "),
+         y = "In-Transit Lead Time (days)") +
+    scale_fill_discrete(name = paste(current_combination, collapse = ", "))
+  
+  # Add the current plot to the plots_list
+  plots_list[[i]] <- current_plot
+}
+# Store plots
+box_ITLT_by_lob <-  plots_list[[1]]
+box_ITLT_by_origin <-  plots_list[[2]]
+box_ITLT_by_shipMode <-  plots_list[[3]]
+box_ITLT_by_lob_origin <- plots_list[[4]]
+box_ITLT_by_lob_shipMode <-  plots_list[[5]]
+box_ITLT_by_origin_shipMode <-  plots_list[[6]]
+box_ITLT_by_all <- plots_list[[7]]
+#-------------------------------------------------------------------------------
+# Fix x axis labels for box_ITLT_by_lob_shipMode & box_ITLT_by_all (too long)
+#-------------------------------------------------------------------------------
+# Modify box_ITLT_by_lob_shipMode
+# Function to generate labels for x-axis and legend
+generate_labels <- function(current_combination, n) {
+  original_labels <- sort(unique(interaction(rawData[, current_combination])))
+  letters_subset <- letters[1:n]
+  new_labels <- setNames(paste0(original_labels, " - ", letters_subset), original_labels)
+  return(new_labels)
+}
+
+# Modify box_ITLT_by_lob_origin
+box_ITLT_by_lob_origin <- box_ITLT_by_lob_origin +
+  scale_x_discrete(labels = letters[1:9]) +
+  scale_fill_discrete(name = paste(group_combinations[[3]], collapse = ", "), labels = generate_labels(group_combinations[[3]], 8)) +
+  labs(x = "")
+
+# Modify box_ITLT_by_origin_shipMode
+box_ITLT_by_origin_shipMode <- box_ITLT_by_origin_shipMode +
+  scale_x_discrete(labels = letters[1:9]) +
+  scale_fill_discrete(name = paste(group_combinations[[6]], collapse = ", "), labels = generate_labels(group_combinations[[6]], 8)) +
+  labs(x = "")
+
+
+# Modify box_ITLT_by_lob_shipMode
+box_ITLT_by_lob_shipMode <- box_ITLT_by_lob_shipMode +
+  scale_x_discrete(labels = letters[1:10]) +
+  scale_fill_discrete(name = paste(group_combinations[[5]], collapse = ", "), labels = generate_labels(group_combinations[[5]], 9)) +
+  labs(x = "")
+
+# Modify box_ITLT_by_all
+box_ITLT_by_all <- box_ITLT_by_all +
+  scale_x_discrete(labels = letters[1:11]) +
+  scale_fill_discrete(name = paste(group_combinations[[7]], collapse = ", "), labels = generate_labels(group_combinations[[7]], 11)) +
+  labs(x = "")
+
+```
+
+## Display Boxplots
+
+### In-Transit Lead Time by LOB
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+box_ITLT_by_lob
+# Product A has the most outliers, Product C has the highest avg.
+```
+
+Product A has the most outliers, Product C has the highest average.
+
+### In-Transit Lead Time by Origin
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+box_ITLT_by_origin
+# Sites B, C, and D have high variability, site A's IQR is the larget, site B 
+# has the highest median
+```
+
+Sites B, C, and D have high variability, site A's IQR is the larget, and site B has the highest median.
+
+### In-Transit Lead Time by Ship Mode
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+box_ITLT_by_shipMode
+# All modes have very high variability
+```
+
+All modes have very high variability.
+
+### In-Transit Lead Time by LOB & Origin
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+box_ITLT_by_lob_origin
+# Product B site A has highest median, also high variability
+
+```
+
+Product B site A has highest median. The overall plot has high variability.
+
+### In-Transit Lead Time by LOB & Ship Mode
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+box_ITLT_by_lob_shipMode
+# Highest variability of all plots, highest median is Product C, OCEAN
+```
+
+Highest variability of all plots, highest median is Product C.OCEAN
+
+### In-Transit Lead Time by Origin & Ship Mode
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+box_ITLT_by_origin_shipMode
+# Site A ocean has highest median, high amount of outliers
+```
+
+Site A ocean has highest median, high amount of outliers
+
+### In-Transit Lead Time by All
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+box_ITLT_by_all
+# some combinations have high variability
+```
+
+Some combinations have high variability. This overall reflects our findings and shows that shipping over water continues to have the highest In-Transit Lead Times.
+
+## Display Outlier Summaries
+
+Because there were many outliers, I wanted to start testing for significance. In order to do this, I created a function to create outlier summaries for each of the unique combinations that were in the group combinations list. Additionally, I calculated the total number of outliers for each as well.
+
+\
+**Note that the first box is the outlier summary and the second is the total amount of outliers for that category**
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+# *** Because there were many outliers, start testing for significance
+#-------------------------------------------------------------------------------
+# Function to calculate outlier summary for given grouping columns
+#-------------------------------------------------------------------------------
+calculate_outlier_summary <- function(data, grouping_columns) {
+  IQR_summary <- data %>%
+    group_by(across(all_of(grouping_columns))) %>%
+    summarise(Q1 = quantile(`In-transit Lead Time`, 0.25, na.rm = TRUE),
+              Q3 = quantile(`In-transit Lead Time`, 0.75, na.rm = TRUE)) %>%
+    mutate(IQR = Q3 - Q1,
+           lowerBound = Q1 - 1.5 * IQR,
+           upperBound = Q3 + 1.5 * IQR)
+  
+  rawData_bounded <- data %>%
+    left_join(IQR_summary, by = grouping_columns) %>%
+    mutate(isOutlier = (`In-transit Lead Time` < lowerBound) | (`In-transit Lead Time` > upperBound))
+  
+  outlier_summary <- rawData_bounded %>%
+    group_by(across(all_of(grouping_columns))) %>%
+    summarise(Total = n(),
+              outliers = sum(isOutlier),
+              OutlierPercentage = (outliers / Total) * 100)
+  
+  return(outlier_summary)
+}
+
+#-------------------------------------------------------------------------------
+# Apply to group combinations
+#-------------------------------------------------------------------------------
+outlier_summaries <- lapply(group_combinations, function(grouping_columns) {
+  calculate_outlier_summary(rawData, grouping_columns)
+})
+#-------------------------------------------------------------------------------
+# Calculate total outliers
+#-------------------------------------------------------------------------------
+# Calculate total outliers for each summary
+total_outliers <- lapply(outlier_summaries, function(outlier_summary) {
+  sum(outlier_summary$outliers)
+})
+
+# Extract total outliers for each group combination
+total_outliers_LOB <- total_outliers[[1]]
+total_outliers_Origin <- total_outliers[[2]]
+total_outliers_ShipMode <- total_outliers[[3]]
+total_outliers_LOB_Origin <- total_outliers[[4]]
+total_outliers_LOB_ShipMode <- total_outliers[[5]]
+total_outliers_Origin_ShipMode <- total_outliers[[6]]
+total_outliers_all <- total_outliers[[7]]
+```
+
+### LOB
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+outlier_summaries[1] # "LOB"
+# Product A has the most outliers at 55 but only 1.87%, low variability
+total_outliers_LOB # 77
+```
+
+Product A has the most outliers at 55 but only 1.87%, low variability.
+
+### Origin 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+outlier_summaries[2] # "Origin"
+total_outliers_Origin # 277
+```
+
+Site D has the most outliers at 125 but percentages are close between each other, moderate variability.
+
+### Ship Mode
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+outlier_summaries[3] # "Ship Mode"
+total_outliers_ShipMode # 611
+```
+
+Air has the most outliers at 303 with 7.94%, ship mode has more outliers than other categories, high overall variability.
+
+### LOB & Origin
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+outlier_summaries[4] # "LOB", "Origin"
+total_outliers_LOB_Origin # 355
+```
+
+Product B Site D has the most outliers at 125 with 5%, moderate variability.
+
+### LOB & Ship Mode
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+outlier_summaries[5] # "LOB", "Ship Mode"
+total_outliers_LOB_ShipMode # 713
+```
+
+Product B OCEAN has 315 outliers with 17.4%, overall highest variability
+
+### Origin & Ship Mode
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+outlier_summaries[6] # "Origin", "Ship Mode"
+total_outliers_Origin_ShipMode # 433
+```
+
+Moderate variability accross, SITE B AIR too small of a sample,
+
+### ALL
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+outlier_summaries[7] # "LOB", "Origin", "Ship Mode"
+# combinations to note: 
+# Product A Site A FASTBOAT - 15.7%, 305 observations
+# Product B Site B AIR - 38.9%, 18 observations
+# Product C Site A AIR - 14.3%, 21 observations
+total_outliers_all # 454
+```
+
+**Unsurprisingly, Ship mode had the single most variability when comparing categories by themselves. However, it is worth noting that the combination of LOB and Ship mode had the highest variability than any other combination. It would be worth investigating this further.**
