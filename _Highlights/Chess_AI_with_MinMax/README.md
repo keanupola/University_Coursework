@@ -30,17 +30,25 @@ You can also run this notebook on Google Colab: [Open in Google Colab](https://c
 ### Setup Instructions
 
 1. **Clone the Repository**:
+```bash
 git clone https://github.com/keanupola/University_Coursework.git
+```
 
 ### Navigate to the Project Directory:
+```bash
 cd University_Coursework/Highlights/Chess_AI_with_MinMax
+```
 
 ### Install Required Libraries (if not already installed):
+```bash
 pip install numpy
+```
 
 ## Running the Program
 Open the Jupyter Notebook:
+```bash
 jupyter notebook CS3793_assignment2_tro893.ipynb
+```
 
 ### Run the Notebook:
 - Execute the cells in order to initialize the game and start playing.
