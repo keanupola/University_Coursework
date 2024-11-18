@@ -1,74 +1,50 @@
-# Implementing Machine Learning Algorithms
+# Chess AI with MinMax Algorithm
 
 ## Project Description
 
-This project involves implementing two fundamental machine learning algorithms from scratch:
-
-1. Gradient Descent for Linear Regression
-2. ID3 Algorithm for Decision Trees
-
-The purpose is to understand the inner workings of these algorithms by coding them without relying on high-level machine learning libraries.
+This project is a Python program that implements a simple chess AI using the MinMax algorithm with alpha-beta pruning. The AI can play against a human player, making decisions based on a depth-limited search of possible moves.
 
 ## Running on Google Colab
 You can also run this notebook on Google Colab: [Open in Google Colab](https://colab.research.google.com/drive/13p44_GLFyvbDXDPBxJVpHuh38qDoUL16?usp=sharing)
 
+
 ## Features
 
-- **Gradient Descent**:
-  - Implements linear regression using gradient descent optimization.
-  - Reads training and testing data from provided .dat files.
-  - Plots the cost function over iterations.
-
-- **ID3 Decision Tree**:
-  - Constructs a decision tree based on training data.
-  - Uses information gain to select the best features.
-  - Evaluates the decision tree on test data.
+- **Game Logic**: Full implementation of chess rules, including movement, captures, check, and checkmate.
+- **AI Opponent**: Computer player uses the MinMax algorithm with alpha-beta pruning for optimal move selection.
+- **User Interface**: Command-line interface for interactive gameplay.
 
 ## Technologies Used
 
 - **Programming Language**: Python 3
-- **Libraries**:
-  - numpy
-  - pandas
-  - matplotlib (for plotting)
+- **Libraries**: `numpy`, `sys` (and any other required libraries)
+- **Development Tools**: Jupyter Notebook (`.ipynb` file)
 
 ## Installation and Usage
 
 ### Prerequisites
 
-- Python 3.x installed
-- Required Python libraries installed
+- Python 3.x installed on your system
+- Required Python libraries installed (`numpy`, etc.)
 
 ### Setup Instructions
 
-1. Clone the Repository:
-   ```bash
-   git clone https://github.com/keanupola/University_Coursework.git
-   ```
+1. **Clone the Repository**:
+git clone https://github.com/keanupola/University_Coursework.git
 
-2. Navigate to the Project Directory:
-   ```bash
-   cd University_Coursework/Highlights/Implementing_Machine_Learning_Algorithms
-   ```
+### Navigate to the Project Directory:
+cd University_Coursework/Highlights/Chess_AI_with_MinMax
 
-3. Install Required Libraries:
-   ```bash
-   pip install numpy pandas matplotlib
-   ```
+### Install Required Libraries (if not already installed):
+pip install numpy
 
-### Run Instructions
+## Running the Program
+Open the Jupyter Notebook:
+jupyter notebook CS3793_assignment2_tro893.ipynb
 
-- Open the Jupyter Notebook:
-  ```bash
-  jupyter notebook CS3793_assignment3_tro893.ipynb
-  ```
+### Run the Notebook:
+- Execute the cells in order to initialize the game and start playing.
+- Follow the on-screen prompts to make your moves.
 
-- Run the notebook cells to execute the code for both algorithms.
-
-### Files in the Project
-
-- CS3793_assignment3_tro893.ipynb - Jupyter Notebook containing the code and explanations.
-- gd-train.dat - Training data for gradient descent.
-- gd-test.dat - Test data for gradient descent.
-- id3-train.dat - Training data for ID3 algorithm.
-- id3-test.dat - Test data for ID3 algorithm.
+## Files in the Project
+- **CS3793_assignment2_tro893.ipynb** - The main Jupyter Notebook containing the code and documentation.
